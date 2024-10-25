@@ -1,6 +1,6 @@
 # outsiders.vim
 
-'Move' the file you are editing to an adjacent tmux pane.
+Move the file you are editing in vim (current buffer) to an adjacent tmux pane.
 
 Think of it as a way to fork and merge Vim instances within tmux.
 
@@ -40,14 +40,13 @@ outsiders.vim provides four mappings in normal mode:
 
 ## Configuration
 
-The plugin works out of the box with default mappings. If you want to change the mappings, add to your `.vimrc`:
+The plugin works out of the box with default mappings. To change the mappings, add to your `.vimrc`:
 
 ```viml
-" Example of custom mappings
-nnoremap <Leader>mu :call <SID>MoveFile('up')<CR>
-nnoremap <Leader>mj :call <SID>MoveFile('down')<CR>
-nnoremap <Leader>mh :call <SID>MoveFile('left')<CR>
-nnoremap <Leader>ml :call <SID>MoveFile('right')<CR>
+nnoremap <silent> <Leader>mk :call outsiders#move_file('up')<CR>
+nnoremap <silent> <Leader>mh :call outsiders#move_file('left')<CR>
+nnoremap <silent> <Leader>mj :call outsiders#move_file('down')<CR>
+nnoremap <silent> <Leader>ml :call outsiders#move_file('right')<CR>
 ```
 
 ## How It Works
