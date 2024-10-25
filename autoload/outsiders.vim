@@ -1,19 +1,13 @@
-" vim-outsiders.vim
-" Move files between vim instances in tmux panes spatially
+" Autoloaded functions for vim-outsiders
 
-if exists('g:loaded_tmux_vim_mover') || !exists('$TMUX')
-    finish
-endif
-let g:loaded_tmux_vim_mover = 1
-
-function! s:GetPanePosition(pane_id)
+function! outsiders#get_pane_position(pane_id)
     return system("tmux display-message -p -t " . a:pane_id . " '#{pane_left} #{pane_top}'")
 endfunction
 
-function! s:GetTmuxPane(direction)
+function! outsiders#get_tmux_pane(direction)
     let l:cmd = "tmux display-message -p '#{pane_id}'"
     let l:current_pane = system(l:cmd)[:-2]
-    let l:current_pos = s:GetPanePosition(l:current_pane)
+    let l:current_pos = outsiders#get_pane_position(l:current_pane)
     
     let l:direction_flag = {
         \ 'up': 'U',
@@ -26,7 +20,7 @@ function! s:GetTmuxPane(direction)
     call system(l:cmd)
     
     let l:target_pane = system("tmux display-message -p '#{pane_id}'")[:-2]
-    let l:target_pos = s:GetPanePosition(l:target_pane)
+    let l:target_pos = outsiders#get_pane_position(l:target_pane)
     
     " Return to original pane
     call system("tmux select-pane -t " . l:current_pane)
@@ -36,7 +30,6 @@ function! s:GetTmuxPane(direction)
         let [l:curr_x, l:curr_y] = split(l:current_pos)
         let [l:target_x, l:target_y] = split(l:target_pos)
         
-        " Detect wraparound based on direction and position
         if (a:direction ==# 'right' && l:target_x < l:curr_x) ||
          \ (a:direction ==# 'left' && l:target_x > l:curr_x) ||
          \ (a:direction ==# 'down' && l:target_y < l:curr_y) ||
@@ -50,7 +43,7 @@ function! s:GetTmuxPane(direction)
     return ''
 endfunction
 
-function! s:CreateNewPane(direction, file, line_number)
+function! outsiders#create_new_pane(direction, file, line_number)
     let l:split_cmd = {
         \ 'up': '-b',
         \ 'down': '',
@@ -58,36 +51,33 @@ function! s:CreateNewPane(direction, file, line_number)
         \ 'right': '-h'
         \ }[a:direction]
     
-    " Create new pane and immediately launch vim with the file
     let l:vim_cmd = "'vim +" . a:line_number . " " . a:file . "'"
     call system("tmux split-window " . l:split_cmd . " " . l:vim_cmd)
     
-    return s:GetTmuxPane(a:direction)
+    return outsiders#get_tmux_pane(a:direction)
 endfunction
 
-function! s:GetPaneCommand(pane_id)
+function! outsiders#get_pane_command(pane_id)
     let l:pane_info = system("tmux list-panes -F '#{pane_id} #{pane_current_command}' | grep " . a:pane_id)
     return split(l:pane_info)[-1]
 endfunction
 
-function! s:IsVimRunningInPane(pane_id)
-    let l:cmd = s:GetPaneCommand(a:pane_id)
+function! outsiders#is_vim_running_in_pane(pane_id)
+    let l:cmd = outsiders#get_pane_command(a:pane_id)
     return l:cmd =~# '\<vim\|\<nvim\>'
 endfunction
 
-function! s:IsShellRunningInPane(pane_id)
-    let l:cmd = s:GetPaneCommand(a:pane_id)
+function! outsiders#is_shell_running_in_pane(pane_id)
+    let l:cmd = outsiders#get_pane_command(a:pane_id)
     return l:cmd =~# '\<bash\|\<zsh\|\<sh\>'
 endfunction
 
-function! s:SendToVim(pane_id, file, line_number)
-    if s:IsVimRunningInPane(a:pane_id)
-        " If Vim is running, escape to normal mode, open file, and go to line
+function! outsiders#send_to_vim(pane_id, file, line_number)
+    if outsiders#is_vim_running_in_pane(a:pane_id)
         let l:cmd = "tmux send-keys -t " . a:pane_id . " Escape ';e " . a:file . "' C-m '" . a:line_number . "G'"
         call system(l:cmd)
         call system("tmux select-pane -t " . a:pane_id)
-    elseif s:IsShellRunningInPane(a:pane_id)
-        " If shell is running, start new vim instance at line
+    elseif outsiders#is_shell_running_in_pane(a:pane_id)
         let l:cmd = "tmux send-keys -t " . a:pane_id . " 'vim +" . a:line_number . " " . a:file . "' C-m"
         call system(l:cmd)
         call system("tmux select-pane -t " . a:pane_id)
@@ -97,12 +87,11 @@ function! s:SendToVim(pane_id, file, line_number)
     endif
 endfunction
 
-function! s:CountListedBuffers()
-    " return len(filter(range(1, bufnr('$')), 'buflisted(v:val)'))
-	return len(filter(range(1, bufnr('$')), 'buflisted(v:val) && bufname(v:val) != ""'))
+function! outsiders#count_listed_buffers()
+    return len(filter(range(1, bufnr('$')), 'buflisted(v:val) && bufname(v:val) != ""'))
 endfunction
 
-function! s:MoveFile(direction)
+function! outsiders#move_file(direction)
     let l:current_file = expand('%:p')
     if empty(l:current_file)
         echo "No file to move"
@@ -111,25 +100,16 @@ function! s:MoveFile(direction)
     
     let l:line_number = line('.')
     
-    let l:target_pane = s:GetTmuxPane(a:direction)
+    let l:target_pane = outsiders#get_tmux_pane(a:direction)
     if empty(l:target_pane)
-        " Create new pane and launch vim immediately
-        let l:target_pane = s:CreateNewPane(a:direction, l:current_file, l:line_number)
+        let l:target_pane = outsiders#create_new_pane(a:direction, l:current_file, l:line_number)
     else
-        " Use existing pane
-        call s:SendToVim(l:target_pane, l:current_file, l:line_number)
+        call outsiders#send_to_vim(l:target_pane, l:current_file, l:line_number)
     endif
     
-	bd
+    bd
     
-    " Quit if no buffers remain
-    if s:CountListedBuffers() == 0
+    if outsiders#count_listed_buffers() == 0
         q
     endif
 endfunction
-
-" Key mappings using mwasd
-nnoremap <silent> <Leader>mw :call <SID>MoveFile('up')<CR>
-nnoremap <silent> <Leader>ma :call <SID>MoveFile('left')<CR>
-nnoremap <silent> <Leader>ms :call <SID>MoveFile('down')<CR>
-nnoremap <silent> <Leader>md :call <SID>MoveFile('right')<CR>
