@@ -32,17 +32,11 @@ outsiders.vim provides four mappings in normal mode:
 - `<Leader>ma` - Move file to pane on the left
 - `<Leader>md` - Move file to pane on the right
 
-When you use these mappings:
 1. If a pane exists in that direction:
    - With Vim: Opens the file in that Vim instance
    - With a shell: Launches Vim with the file
 2. If no pane exists in that direction:
-   - Creates a new pane
-   - Opens the file in a new Vim instance
-3. In all cases:
-   - Cursor position is preserved
-   - Focus follows the file
-   - The file is closed in the original pane
+   - Creates a new pane + opens the file in a new Vim instance
 
 ## Configuration
 
