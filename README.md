@@ -2,14 +2,14 @@
 
 'Move' the file you are editing to an adjacent tmux pane.
 
-Think of it as a way to fork and merge Vim instances.
+Think of it as a way to fork and merge Vim instances within tmux.
 
 ## Features
 
-- Move files between Vim instances using spatial directions (up, down, left, right)
-- Automatically creates new tmux panes when attempting to move to a window edge
+- Move files between Vim instances spatially (up, down, left, right)
+- Automatically create a new tmux pane when moving into a window edge
 - Preserves cursor position when moving files
-- Focus follows the file, making the workflow smooth and intuitive
+- Focus follows the file
 
 ## Installation
 
@@ -25,7 +25,7 @@ Plugin 'sturob/vim-outsiders'
 
 ## Usage
 
-vim-outsiders provides four mappings in normal mode:
+outsiders.vim provides four mappings in normal mode:
 
 - `<Leader>mw` - Move file to pane above
 - `<Leader>ms` - Move file to pane below
@@ -58,13 +58,11 @@ nnoremap <Leader>ml :call <SID>MoveFile('right')<CR>
 
 ## How It Works
 
-vim-outsiders uses tmux commands to:
+outsiders.vim uses tmux commands to:
 1. Detect existing panes and their positions
 2. Create new panes when needed
 3. Send commands to target panes to open files
 4. Manage focus between panes
-
-The plugin is designed to work with tmux's spatial layout system, making it feel natural and intuitive.
 
 ## License
 
