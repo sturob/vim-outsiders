@@ -97,6 +97,11 @@ function! s:SendToVim(pane_id, file, line_number)
     endif
 endfunction
 
+function! s:CountListedBuffers()
+    " return len(filter(range(1, bufnr('$')), 'buflisted(v:val)'))
+	return len(filter(range(1, bufnr('$')), 'buflisted(v:val) && bufname(v:val) != ""'))
+endfunction
+
 function! s:MoveFile(direction)
     let l:current_file = expand('%:p')
     if empty(l:current_file)
@@ -110,16 +115,17 @@ function! s:MoveFile(direction)
     if empty(l:target_pane)
         " Create new pane and launch vim immediately
         let l:target_pane = s:CreateNewPane(a:direction, l:current_file, l:line_number)
-        " if empty(l:target_pane)
-        "     return
-        " endif
     else
         " Use existing pane
         call s:SendToVim(l:target_pane, l:current_file, l:line_number)
     endif
     
-    " Close file in current vim instance
-    bd
+	bd
+    
+    " Quit if no buffers remain
+    if s:CountListedBuffers() == 0
+        q
+    endif
 endfunction
 
 " Key mappings using mwasd
