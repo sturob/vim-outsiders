@@ -1,6 +1,6 @@
 # outsiders.vim
 
-Move the file you are editing in vim (current buffer) to an adjacent tmux pane.
+Move the file open in your current buffer to a vim instance in an adjacent tmux pane.
 
 Think of it as a way to fork and merge Vim instances within tmux.
 
