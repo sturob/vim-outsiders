@@ -2,11 +2,11 @@
 
 Relocate the file in the current Vim buffer to a Vim instance in an adjacent tmux pane.
 
-For people who prefer to use tmux panes over vim windows.
+For people who prefer to use tmux panes over Vim windows.
 
 ## Features
 
-- Shunt files between vim instances spatially (up, down, left, right)
+- Shunt files between Vim instances spatially (up, down, left, right)
 - Automatically create a new tmux pane when moving into a window edge
 - Preserves cursor position when moving files
 - Focus follows the file
@@ -52,7 +52,7 @@ nnoremap <silent> <Leader>ml :call outsiders#move_file('right')<CR>
 ## How It Works
 
 outsiders.vim uses tmux to:
-1. Detect existing panes, their positions, and whether vim is running in them
+1. Detect existing panes, their positions, and whether Vim is running in them
 2. Create new panes when needed
 3. Send commands to target panes to open files
 4. Manage focus between panes
