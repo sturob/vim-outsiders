@@ -1,12 +1,12 @@
 # outsiders.vim
 
-Move the file open in your current buffer to a Vim instance in an adjacent tmux pane.
+Relocate the file in the current Vim buffer to a Vim instance in an adjacent tmux pane.
 
-Think of it as a way to split and merge Vim instances within tmux.
+For people who prefer to use tmux panes over vim windows.
 
 ## Features
 
-- Move files between Vim instances spatially (up, down, left, right)
+- Shunt files between vim instances spatially (up, down, left, right)
 - Automatically create a new tmux pane when moving into a window edge
 - Preserves cursor position when moving files
 - Focus follows the file
@@ -32,10 +32,10 @@ outsiders.vim provides four mappings in normal mode:
 - `<Leader>ma` - Move file to pane on the left
 - `<Leader>md` - Move file to pane on the right
 
-1. If a pane exists in that direction:
+1. If a tmux pane exists in that direction:
    - With Vim: Opens the file in that Vim instance
    - With a shell: Launches Vim with the file
-2. If no pane exists in that direction:
+2. If no tmux pane exists in that direction:
    - Creates a new pane + opens the file in a new Vim instance
 
 ## Configuration
@@ -51,8 +51,8 @@ nnoremap <silent> <Leader>ml :call outsiders#move_file('right')<CR>
 
 ## How It Works
 
-outsiders.vim uses tmux commands to:
-1. Detect existing panes and their positions
+outsiders.vim uses tmux to:
+1. Detect existing panes, their positions, and whether vim is running in them
 2. Create new panes when needed
 3. Send commands to target panes to open files
 4. Manage focus between panes
